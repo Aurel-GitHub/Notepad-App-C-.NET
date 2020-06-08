@@ -46,13 +46,13 @@ namespace Notepad.Controls
         {
             var editDropDown = new ToolStripMenuItem("Edition");
 
-            var cancel = new ToolStripMenuItem("Annuler", null, null, Keys.Control | Keys.Z);
-            var restore = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.Y);
+            var undo = new ToolStripMenuItem("Annuler", null, null, Keys.Control | Keys.Z);
+            var redo = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.Y);
             //ici le copier coller sont rajoutés en plus
             var copy = new ToolStripMenuItem("Copier", null, null, Keys.Control | Keys.C);
             var paste = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.V);
 
-            cancel.Click += (s, e) =>
+            undo.Click += (s, e) =>
             {
                 if (MainForm.RichTextBox.CanUndo)
                 {
@@ -60,7 +60,15 @@ namespace Notepad.Controls
                 };    
             };
 
-            editDropDown.DropDownItems.AddRange(new ToolStripItem[] { cancel, restore, copy, paste });
+            redo.Click += (s, e) =>
+            {
+                if (MainForm.RichTextBox.CanRedo)
+                {
+                    MainForm.RichTextBox.Redo();
+                };
+            };
+
+            editDropDown.DropDownItems.AddRange(new ToolStripItem[] { undo, redo, copy, paste });
 
             Items.Add(editDropDown);
         }
