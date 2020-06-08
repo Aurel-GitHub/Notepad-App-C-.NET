@@ -13,14 +13,22 @@ namespace Notepad
 {
     public partial class MainForm : Form
     {
-        //Création des onglets, raccourcis
+        public static RichTextBox RichTextBox;
+         
         public MainForm()
         {
             InitializeComponent();
-            MainMenuStrip menuStrip = new MainMenuStrip();
-            Controls.Add(menuStrip);
+            var menuStrip = new MainMenuStrip();
+            var maintabControl = new MainTabControl();  
+            RichTextBox = new CustomRichTextBox();
+
+            maintabControl.TabPages.Add("Onglet 1");
+            maintabControl.TabPages[0].Controls.Add(RichTextBox);
+
+            Controls.AddRange( new Control[] { maintabControl, menuStrip });
+
         }
 
-       
+      
     }
 }
