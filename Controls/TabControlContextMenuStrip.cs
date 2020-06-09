@@ -20,6 +20,12 @@ namespace Notepad.Controls
 
             Items.AddRange(new ToolStripItem[] { closeTab, closeAllTabsExceptThis, openFileInExplorer });
         }
-            
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            this.ResumeLayout(false);
+
+        }
     }
 }
