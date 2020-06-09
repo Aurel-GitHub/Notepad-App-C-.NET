@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -14,6 +15,8 @@ namespace Notepad.Objects
         private static string _applicationPath = Path.Combine(_applicationDataPath, "Notepad.NET");
 
         private readonly XmlWriterSettings _writterSettings;
+
+        public static string BackupPath = Path.Combine(_applicationDataPath, "Notepad.NET", "backup");
 
         /// <summary>
         /// Chemin d'accès et nom du fichier représentant la session.
@@ -50,6 +53,22 @@ namespace Notepad.Objects
             using (XmlWriter writer = XmlWriter.Create(FileName, _writterSettings))
             {
                 serializer.Serialize(writer, this, emptyNamespace);
+            }
+        }
+
+        public async void BackUpFile(TextFile file)
+        {
+            if(!Directory.Exists(BackupPath))
+            {
+                await Task.Run(() => Directory.CreateDirectory(BackupPath));
+            }
+
+            if (file.FileName.StartsWith("Sans titre"))
+            {
+                using(StreamWriter writer = File.CreateText(file.BackupFileName))
+                {
+                    await writer.WriteAsync(file.Contents);
+                }
             }
         }
     }

@@ -46,6 +46,13 @@ namespace Notepad
             }
 
         }
+
+        private void MainForm_FormCLosing(object sender, FormClosingEventArgs e)
+        {
+            Session.Save();
+
+
+        }
       
     }
 }
