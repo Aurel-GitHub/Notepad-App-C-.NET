@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Notepad.Objects;
 using System.Windows.Forms;
+
 
 namespace Notepad.Controls
 {
     public class MainMenuStrip : MenuStrip
     {
-        //Création des onglets, raccourcis
 
         private const string NAME = "MainMenuStrip";
-        
+
+        private MainForm _form;
         private FontDialog _fontDialog;
 
         public MainMenuStrip()
@@ -25,19 +23,48 @@ namespace Notepad.Controls
             EditDropDown();
             FormatDropDownMenu();
             ViewDropDownMenu();
+
+            HandleCreated += (s, e) =>
+             {
+                 _form = FindForm() as MainForm;    
+             };
         }
 
         public void FileDropDownMenu()
-        {
+        { 
             var fileDropDownMenu = new ToolStripMenuItem("Fichier");
 
-            var newMenu = new ToolStripMenuItem("Nouveau", null, null, Keys.Control | Keys.N);
-            var openMenu = new ToolStripMenuItem("Ouvrir...", null, null, Keys.Control | Keys.O);
-            var saveMenu = new ToolStripMenuItem("Enrengistrer", null, null, Keys.Control | Keys.S);
-            var saveAsMenu = new ToolStripMenuItem("Enrengistrer sous...", null, null, Keys.Control | Keys.Shift | Keys.S);
-            var quitMenu = new ToolStripMenuItem("Quitter", null, null, Keys.Alt | Keys.F4);
+            var newFile = new ToolStripMenuItem("Nouveau", null, null, Keys.Control | Keys.N);
+            var open = new ToolStripMenuItem("Ouvrir...", null, null, Keys.Control | Keys.O);
+            var save = new ToolStripMenuItem("Enrengistrer", null, null, Keys.Control | Keys.S);
+            var saveAs = new ToolStripMenuItem("Enrengistrer sous...", null, null, Keys.Control | Keys.Shift | Keys.S);
+            var quit = new ToolStripMenuItem("Quitter", null, null, Keys.Alt | Keys.F4);
 
-            fileDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { newMenu, openMenu, saveMenu, saveAsMenu, quitMenu });
+            newFile.Click += (s, e) =>
+            {
+                var tabControl = _form.MainTabControl;
+                var tabPagesCount = tabControl.TabPages.Count;
+
+                var fileName = $"Sans titre {tabPagesCount +1}";
+                var file = new TextFile(fileName);
+                var rtb = new CustomRichTextBox();
+                            
+                tabControl.TabPages.Add(file.SafeFileName);
+                    
+                var newTabPage = tabControl.TabPages[tabPagesCount];
+
+                newTabPage.Controls.Add(rtb);
+                tabControl.SelectedTab = newTabPage;
+
+
+                newTabPage.Controls.Add(rtb);
+                _form.Session.TextFiles.Add(file);
+                _form.CurrentFile = file;
+                _form.CurrentRtb = rtb;
+            };
+
+
+            fileDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { newFile, open, save, saveAs, quit });
 
             Items.Add(fileDropDownMenu);
         }
@@ -48,23 +75,22 @@ namespace Notepad.Controls
 
             var undo = new ToolStripMenuItem("Annuler", null, null, Keys.Control | Keys.Z);
             var redo = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.Y);
-            //ici le copier coller sont rajoutés en plus
             var copy = new ToolStripMenuItem("Copier", null, null, Keys.Control | Keys.C);
             var paste = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.V);
 
             undo.Click += (s, e) =>
             {
-                if (MainForm.RichTextBox.CanUndo)
+                if (_form.CurrentRtb.CanUndo)
                 {
-                    MainForm.RichTextBox.Undo();
+                    _form.CurrentRtb.Undo();
                 };    
             };
 
             redo.Click += (s, e) =>
             {
-                if (MainForm.RichTextBox.CanRedo)
+                if (_form.CurrentRtb.CanRedo)
                 {
-                    MainForm.RichTextBox.Redo();
+                    _form.CurrentRtb.Redo();
                 };
             };
 
@@ -81,17 +107,16 @@ namespace Notepad.Controls
 
             font.Click += (s, e) =>
             {
-                _fontDialog.Font = MainForm.RichTextBox.Font;
+                _fontDialog.Font = _form.CurrentRtb.Font;
                 _fontDialog.ShowDialog();
 
-                MainForm.RichTextBox.Font = _fontDialog.Font;
+                _form.CurrentRtb.Font = _fontDialog.Font;
             };
 
 
             formatDropDown.DropDownItems.AddRange(new ToolStripItem[] { font});
 
             Items.Add(formatDropDown);
-
         }
 
         public void ViewDropDownMenu()
@@ -125,23 +150,23 @@ namespace Notepad.Controls
 
             zoomIn.Click += (s, e) =>
             {
-                if(MainForm.RichTextBox.ZoomFactor < 3)
+                if(_form.CurrentRtb.ZoomFactor < 3)
                 {
-                    MainForm.RichTextBox.ZoomFactor += 0.3F;
+                    _form.CurrentRtb.ZoomFactor += 0.3F;
                 }
             };
 
             zoomOut.Click += (s, e) =>
             {
-                if (MainForm.RichTextBox.ZoomFactor > 0.3)
+                if (_form.CurrentRtb.ZoomFactor > 0.3)
                 {
-                    MainForm.RichTextBox.ZoomFactor -= 0.3F;
+                    _form.CurrentRtb.ZoomFactor -= 0.3F;
                 }
             };
 
             restoreZoom.Click += (s, e) =>
             {
-                MainForm.RichTextBox.ZoomFactor = 1F;
+                _form.CurrentRtb.ZoomFactor = 1F;
             };  
 
             zoomDropDown.DropDownItems.AddRange(new ToolStripItem[] { zoomIn, zoomOut, restoreZoom });

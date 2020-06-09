@@ -1,34 +1,54 @@
 ﻿using Notepad.Controls;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Notepad.Objects;
 using System.Windows.Forms;
+
 
 namespace Notepad
 {
     public partial class MainForm : Form
     {
-        public static RichTextBox RichTextBox;
-         
+        public RichTextBox CurrentRtb;
+        public TextFile CurrentFile;
+        public TabControl MainTabControl;
+        public Session Session; 
+        
+
         public MainForm()
         {
             InitializeComponent();
+
+            Session = new Session(); 
+
             var menuStrip = new MainMenuStrip();
-            var maintabControl = new MainTabControl();  
-            RichTextBox = new CustomRichTextBox();
+            MainTabControl = new MainTabControl();
 
-            maintabControl.TabPages.Add("Onglet 1");
-            maintabControl.TabPages[0].Controls.Add(RichTextBox);
+            Controls.AddRange( new Control[] { MainTabControl, menuStrip });
 
-            Controls.AddRange( new Control[] { maintabControl, menuStrip });
-
+            InitializeFile();
         }
 
-      
+        private void InitializeFile()
+        {
+            if (Session.TextFiles.Count == 0)
+            {
+                var file = new TextFile("Sans titre 1");
+
+                MainTabControl.TabPages.Add(file.SafeFileName);
+
+                var tabPage = MainTabControl.TabPages[0];
+                var rtb = new CustomRichTextBox();
+                tabPage.Controls.Add(rtb);
+                rtb.Select();
+
+                Session.TextFiles.Add(file);
+                CurrentFile = file;
+                CurrentRtb = rtb;
+            }
+
+        }
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Session.Save(); 
+        }
     }
 }
