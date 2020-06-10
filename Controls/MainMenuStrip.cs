@@ -60,7 +60,7 @@ namespace Notepad.Controls
                 tabControl.SelectedTab = newTabPage;
 
                 newTabPage.Controls.Add(rtb);
-                _form.Session.TextFiles.Add(file);
+                _form.Session.Files.Add(file);
                 _form.CurrentFile = file;
                 _form.CurrentRtb = rtb;
             };
@@ -88,7 +88,7 @@ namespace Notepad.Controls
                     tabControl.TabPages.Add(file.SafeFileName);
                     tabControl.TabPages[tabCount].Controls.Add(rtb);
 
-                    _form.Session.TextFiles.Add(file);
+                    _form.Session.Files.Add(file);
                     _form.CurrentRtb = rtb;
                     _form.CurrentFile = file;
                     tabControl.SelectedTab = tabControl.TabPages[tabCount];
