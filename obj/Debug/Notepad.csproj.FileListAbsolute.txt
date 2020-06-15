@@ -8,3 +8,4 @@ C:\Users\MOI\source\repos\Notepad\obj\Debug\Notepad.exe
 C:\Users\MOI\source\repos\Notepad\obj\Debug\Notepad.pdb
 C:\Users\MOI\source\repos\Notepad\obj\Debug\Notepad.MainForm.resources
 C:\Users\MOI\source\repos\Notepad\obj\Debug\Notepad.Controls.TabControlContextMenuStrip.resources
+C:\Users\MOI\source\repos\Notepad\obj\Debug\Notepad.csproj.CoreCompileInputs.cache

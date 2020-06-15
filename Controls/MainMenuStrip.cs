@@ -57,10 +57,10 @@ namespace Notepad.Controls
                 var newTabPage = tabControl.TabPages[tabCount];
 
                 newTabPage.Controls.Add(rtb);
+                _form.Session.Files.Add(file);
                 tabControl.SelectedTab = newTabPage;
 
-                newTabPage.Controls.Add(rtb);
-                _form.Session.Files.Add(file);
+                newTabPage.Controls.Add(rtb);   
                 _form.CurrentFile = file;
                 _form.CurrentRtb = rtb;
             };
