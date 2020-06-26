@@ -2,6 +2,8 @@
 using Notepad.Objects;
 using System.Windows.Forms;
 using System.IO;
+using System.Linq;
+using Notepad.Services;
 
 namespace Notepad.Controls
 {
@@ -13,6 +15,7 @@ namespace Notepad.Controls
         private MainForm _form;
         private FontDialog _fontDialog;
         private OpenFileDialog _openFileDialog;
+        private SaveFileDialog _saveFileDialog;
 
         public MainMenuStrip()
         {
@@ -21,6 +24,7 @@ namespace Notepad.Controls
 
             _fontDialog = new FontDialog();
             _openFileDialog = new OpenFileDialog();
+            _saveFileDialog = new SaveFileDialog();
 
             FileDropDownMenu();
             EditDropDown();
@@ -93,6 +97,76 @@ namespace Notepad.Controls
                     _form.CurrentFile = file;
                     tabControl.SelectedTab = tabControl.TabPages[tabCount];
                 }
+            };
+
+            save.Click += async (s, e) =>
+            {
+                var currentFile = _form.CurrentFile;
+                var currentRtbText = _form.CurrentRtb.Text;
+
+                if (currentFile.Contents != currentRtbText)
+                {
+                    if (File.Exists(currentFile.FileName))
+                    {
+                        using (StreamWriter writer = File.CreateText(currentFile.FileName))
+                        {
+                            await writer.WriteAsync(currentFile.Contents);
+                        }
+                    }
+                    currentFile.Contents = currentRtbText;
+                    _form.Text = currentFile.FileName;
+                    _form.MainTabControl.SelectedTab.Text = currentFile.SafeFileName;
+                }
+                else
+                {
+                    saveAs.PerformClick();
+                }
+            };
+
+            saveAs.Click +=  async (s, e) =>
+            {
+                if (_saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var newFileName = _saveFileDialog.FileName;
+                    var alreadyExists = false;
+
+                    foreach (var file in _form.Session.Files)
+                    {
+                        if(file.FileName == newFileName)
+                        {
+                            MessageBox.Show("Ce fichier est déjà ouvert dans Notepad.NET", "ERREUR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            alreadyExists = true;
+                            break;
+                        }
+                    }
+                    
+                    // si le fichier à enrengistrer n'existe pas.
+                    if(!alreadyExists)
+                    {
+                        var file = new TextFile(newFileName) { Contents = _form.CurrentRtb.Text };
+
+                        var oldFile = _form.Session.Files.Where(x => x.FileName == _form.CurrentFile.FileName).First();
+
+                        _form.Session.Files.Replace(oldFile, file);
+
+                        using (StreamWriter writer = File.CreateText(file.FileName))
+                        {
+                            await writer.WriteAsync(file.Contents);
+                        }
+
+                        _form.MainTabControl.SelectedTab.Text = file.SafeFileName;
+                        _form.Text = file.FileName;
+                        _form.CurrentFile = file;
+
+                    }
+
+                   
+                }
+            };
+
+            quit.Click += (s, e) =>
+            {
+                Application.Exit();
             };
 
 
